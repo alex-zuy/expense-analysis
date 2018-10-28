@@ -4,10 +4,9 @@ import {connect, Provider} from "react-redux";
 import './App.css';
 
 import {createStore} from "./store/createStore";
-import {changeMessage} from "./store/actions";
+import {changeMessage, changeMessageAsync} from "./store/actions";
 import {RootState} from "./store/rootState";
 import Message from "./Message/Message";
-import logo from './logo.svg';
 
 class App extends React.Component<{}> {
 
@@ -20,13 +19,12 @@ class App extends React.Component<{}> {
 
   public render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
+      <div>
           <button type="button" onClick={() => this.store.dispatch(changeMessage('banana'))}>
               Banana
+          </button>
+          <button type="button" onClick={() => this.store.dispatch(changeMessageAsync('banana async'))}>
+              Banana async
           </button>
           <Provider store={this.store}>
               <Message/>
