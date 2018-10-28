@@ -1,21 +1,23 @@
-import {changeMessage, changeMessageAsync} from "./actions";
-import {all, put} from "redux-saga/effects";
-import {takeEvery} from "redux-saga/effects";
 import {Action} from "redux-actions";
 import {delay} from "redux-saga";
+import {all, put, take, takeEvery} from "redux-saga/effects";
+import * as actions from "./actions";
+import * as tasksApi from '../api/tasks';
 import {ReturnType} from "../types/ReturnType";
+import {AxiosResponse} from "axios";
+import {Task} from "../domain/Task";
 
-function* changeMessageAsyncSaga(action: ReturnType<typeof changeMessageAsync>) {
-    yield delay(500);
-    yield put(changeMessage(action.payload!));
+function* loadInitialDataSaga(action: ReturnType<typeof actions.loadInitialData>) {
+    const tasks: AxiosResponse<Task[]> = yield tasksApi.getTasks();
+    yield put(actions.loadTasksListIntoState(tasks.data));
 }
 
-function* changeMessageAsyncWatcher() {
-    yield takeEvery(changeMessageAsync, changeMessageAsyncSaga);
+function* loadInitialDataWatcher() {
+    yield loadInitialDataSaga(yield take(actions.loadInitialData));
 }
 
 export function* rootSaga() {
     yield all([
-        changeMessageAsyncWatcher()
+        loadInitialDataWatcher(),
     ])
 }

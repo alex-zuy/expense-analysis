@@ -1,12 +1,11 @@
 import * as React from 'react';
 import {combineReducers, Store} from 'redux';
 import {connect, Provider} from "react-redux";
-import './App.css';
 
 import {createStore} from "./store/createStore";
-import {changeMessage, changeMessageAsync} from "./store/actions";
 import {RootState} from "./store/rootState";
-import Message from "./Message/Message";
+import * as actions from './store/actions';
+import TasksList from "./TasksList/TasksList";
 
 class App extends React.Component<{}> {
 
@@ -17,21 +16,20 @@ class App extends React.Component<{}> {
         this.store = createStore();
     }
 
-  public render() {
-    return (
-      <div>
-          <button type="button" onClick={() => this.store.dispatch(changeMessage('banana'))}>
-              Banana
-          </button>
-          <button type="button" onClick={() => this.store.dispatch(changeMessageAsync('banana async'))}>
-              Banana async
-          </button>
-          <Provider store={this.store}>
-              <Message/>
-          </Provider>
-      </div>
-    );
-  }
+
+    componentDidMount() {
+        this.store.dispatch(actions.loadInitialData());
+    }
+
+    public render() {
+        return (
+            <div>
+                <Provider store={this.store}>
+                    <TasksList/>
+                </Provider>
+            </div>
+        );
+    }
 }
 
 export default App;

@@ -1,12 +1,18 @@
-import {Action, handleAction, Reducer} from "redux-actions";
-import {changeMessage} from "./actions";
+import {Action, handleAction, handleActions, Reducer} from "redux-actions";
+import {changeMessage, loadTasksListIntoState} from "./actions";
+import {Task} from "../domain/Task";
+import {combineReducers} from "redux";
 
-export type RootState = string | null;
+type TasksState = Task[] | null;
 
-const messageReducer: Reducer<RootState, string> = handleAction(
-    changeMessage,
-    (state, action) => action.payload!,
-    null
-);
+export type RootState = {
+    tasks: TasksState
+}
 
-export default messageReducer;
+const tasksReducer: Reducer<TasksState, any> = handleActions({
+    [loadTasksListIntoState.toString()]: (state, action) => action.payload!
+}, null);
+
+export default combineReducers({
+    tasks: tasksReducer,
+});
