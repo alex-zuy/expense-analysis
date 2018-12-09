@@ -5,6 +5,7 @@ import {connect, Provider} from 'react-redux';
 import {createStore} from './store/createStore';
 import {RootState} from './store/rootState';
 import * as actions from './store/actions';
+import DashboardLayout from './components/DashboardLayout';
 import TasksList from './TasksList/TasksList';
 
 class App extends React.Component<{}> {
@@ -16,18 +17,18 @@ class App extends React.Component<{}> {
         this.store = createStore();
     }
 
-
     componentDidMount() {
         this.store.dispatch(actions.loadInitialData());
     }
 
     public render() {
         return (
-            <div>
-                <Provider store={this.store}>
-                    <TasksList/>
-                </Provider>
-            </div>
+            <Provider store={this.store}>
+                <DashboardLayout
+                    menu={'menu content'}
+                    content={<TasksList/>}
+                />
+            </Provider>
         );
     }
 }

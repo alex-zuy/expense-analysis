@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
+    "purecss": "^1.0.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
+    "react-jss": "^8.6.1",
     "react-redux": "^5.1.0",
     "react-scripts-ts": "3.1.0",
     "redux": "^4.0.1",
@@ -20,6 +22,7 @@
   },
   "devDependencies": {
     "@types/jest": "^23.3.7",
+    "@types/jss": "^9.5.7",
     "@types/node": "^10.12.0",
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
