@@ -1,4 +1,4 @@
-import {RootState} from "./rootState";
+import {RootState} from './rootState';
 
 export const getTasks = ({tasks}: RootState) => ({
     list: tasks || [],

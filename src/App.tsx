@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {combineReducers, Store} from 'redux';
-import {connect, Provider} from "react-redux";
+import {connect, Provider} from 'react-redux';
 
-import {createStore} from "./store/createStore";
-import {RootState} from "./store/rootState";
+import {createStore} from './store/createStore';
+import {RootState} from './store/rootState';
 import * as actions from './store/actions';
-import TasksList from "./TasksList/TasksList";
+import TasksList from './TasksList/TasksList';
 
 class App extends React.Component<{}> {
 

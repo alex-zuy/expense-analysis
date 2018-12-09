@@ -1,5 +1,5 @@
-import {createAction} from "redux-actions";
-import {Task} from "../domain/Task";
+import {createAction} from 'redux-actions';
+import {Task} from '../domain/Task';
 
 export const changeMessage = createAction<string>('CHANGE_MESSAGE');
 

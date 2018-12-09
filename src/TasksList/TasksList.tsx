@@ -1,11 +1,11 @@
 import * as React from 'react';
-import {connect} from "react-redux";
+import {connect} from 'react-redux';
 
-import {Task} from "../domain/Task";
-import {RootState} from "../store/rootState";
+import {Task} from '../domain/Task';
+import {RootState} from '../store/rootState';
 import * as selectors from '../store/selectors';
 
-import TaskView from "./components/TaskView/TaskView";
+import TaskView from './components/TaskView/TaskView';
 
 interface TasksListProps {
     tasks: {

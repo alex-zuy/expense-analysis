@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Task} from "../../../domain/Task";
-import {Item} from "../../../domain/Item";
+import {Task} from '../../../domain/Task';
+import {Item} from '../../../domain/Item';
 
 interface TaskViewProps {
     task: Task
