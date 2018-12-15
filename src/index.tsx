@@ -5,6 +5,7 @@ import './index.css';
 
 import 'purecss/build/base.css';
 import 'purecss/build/buttons.css';
+import 'purecss/build/forms.css';
 
 import registerServiceWorker from './registerServiceWorker';
 
