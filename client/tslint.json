@@ -1,5 +1,5 @@
 {
-  "extends": [],
+  "extends": "../tslint.json",
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
