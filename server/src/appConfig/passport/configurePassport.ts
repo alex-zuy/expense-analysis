@@ -16,7 +16,7 @@ export const configurePassport = (passport: PassportStatic, authenticationServic
             const user = await authenticationService.getUserById(id);
             done(null, user);
         } catch (e) {
-            done(e, false);
+            done(e);
         }
     });
 };

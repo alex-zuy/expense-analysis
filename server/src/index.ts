@@ -9,6 +9,7 @@ import * as passport from 'passport';
 import {createConnection} from 'typeorm';
 import {createServices} from './appConfig/createServices';
 import {configurePassport} from './appConfig/passport/configurePassport';
+import {loginHandler} from './appConfig/passport/loginHandler';
 import {BcryptPasswordHashingHandler} from './PasswordHashingHandler';
 
 const app = express();
@@ -47,11 +48,7 @@ createConnection()
         app.use(passport.initialize());
         app.use(passport.session());
 
-        const LOGIN_PAGE_URL = '/login';
-        app.post(LOGIN_PAGE_URL, passport.authenticate('local', {
-            successRedirect: '/',
-            failureRedirect: LOGIN_PAGE_URL,
-        }));
+        app.post('/login', loginHandler);
 
         server.applyMiddleware({app});
 

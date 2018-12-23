@@ -1,6 +1,10 @@
 import {Strategy} from 'passport-local';
 import AuthenticationService from '../../services/AuthenticationService';
 
+export interface InfoData {
+    message: string
+}
+
 export default class DbLocalStrategy extends Strategy {
 
     private readonly authenticationService: AuthenticationService;
@@ -14,10 +18,11 @@ export default class DbLocalStrategy extends Strategy {
                 if (user !== null) {
                     done(null, user);
                 } else {
-                    done(null, false, {message: 'Incorrect username or password'})
+                    const info: InfoData = {message: 'Incorrect username or password'};
+                    done(null, false, info);
                 }
             } catch (e) {
-                done(e, false);
+                done(e);
             }
         });
     }
