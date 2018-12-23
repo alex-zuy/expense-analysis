@@ -9,6 +9,7 @@ import * as passport from 'passport';
 import {createConnection} from 'typeorm';
 import {createServices} from './appConfig/createServices';
 import {configurePassport} from './appConfig/passport/configurePassport';
+import {BcryptPasswordHashingHandler} from './PasswordHashingHandler';
 
 const app = express();
 
@@ -35,7 +36,9 @@ app.use(morgan('dev'));
 
 createConnection()
     .then((connection) => {
-        const services = createServices(connection);
+        const passwordHashingHandler = new BcryptPasswordHashingHandler();
+
+        const services = createServices(connection, passwordHashingHandler);
 
         configurePassport(passport, services.authenticationService);
 

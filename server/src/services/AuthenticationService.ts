@@ -1,16 +1,16 @@
 import {Repository} from 'typeorm';
 import User from '../entities/User';
-import {PasswordHashFunction} from '../passwordHash';
+import {PasswordHashingHandler} from '../PasswordHashingHandler';
 
 export default class AuthenticationService {
 
     private readonly userRepository: Repository<User>;
 
-    private readonly passwordHashFunction: PasswordHashFunction;
+    private readonly passwordHashingHandler: PasswordHashingHandler;
 
-    constructor(userRepository: Repository<User>, passwordHashFunction: PasswordHashFunction) {
+    constructor(userRepository: Repository<User>, passwordHashingHandler: PasswordHashingHandler) {
         this.userRepository = userRepository;
-        this.passwordHashFunction = passwordHashFunction;
+        this.passwordHashingHandler = passwordHashingHandler;
     }
 
     async tryMatchUserByEmailAndPassword(email: string, rawPassword: string): Promise<User | null> {
@@ -20,10 +20,14 @@ export default class AuthenticationService {
             .where({email})
             .getOne();
 
-        const rawPasswordHash = await this.passwordHashFunction(rawPassword);
+        const isUserExistsAndPasswordMatch = userWithPassword !== undefined
+            && await this.passwordHashingHandler.compareRawWithHash({
+                hash: userWithPassword.password,
+                raw: rawPassword
+            });
 
-        if(userWithPassword !== undefined && userWithPassword.password === rawPasswordHash) {
-            return this.getUserById(userWithPassword.id);
+        if (isUserExistsAndPasswordMatch) {
+            return this.getUserById(userWithPassword!.id);
         } else {
             return null;
         }
