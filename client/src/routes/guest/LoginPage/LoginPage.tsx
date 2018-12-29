@@ -9,7 +9,7 @@ import * as loginPageState from '../../../store/state/pages/login';
 
 interface LoginPageProps {
     fields: loginPageState.FieldsState,
-    loginStatus: loginPageState.LoginStatusState,
+    loginStatus: loginPageState.StatusState,
     onEmailChange: (s: string) => void,
     onPasswordChange: (s: string) => void,
     onAttemptLogin: () => void
@@ -49,7 +49,7 @@ const LoginPage: React.SFC<RouteComponentProps & LoginPageProps & WithStyles> = 
     return (
         <div className={classes.container}>
             <div className={`pure-form ${classes.form}`}>
-                {props.loginStatus.loginFinished && (
+                {props.loginStatus.finished && (
                     <Redirect to="/"/>
                 )}
                 <legend className={classes.legend}>

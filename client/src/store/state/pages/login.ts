@@ -1,61 +1,61 @@
 import {combineReducers, Reducer} from 'redux';
-import {createAction, handleAction, handleActions} from 'redux-actions';
-import reduceReducers from 'reduce-reducers';
-
-const PREFIX = 'login-page/';
+import {ActionType, createStandardAction, getType} from 'typesafe-actions';
 
 export interface FieldsState {
     email: string,
     password: string,
 }
 
-export interface LoginStatusState {
-    loginError: string | null,
-    loginFinished: boolean
+export interface StatusState {
+    error: string | null,
+    finished: boolean
 }
 
-export interface LocalState {
+export interface LoginState {
     fields: FieldsState,
-    loginStatus: LoginStatusState
+    loginStatus: StatusState
 }
 
 export const actions = {
-    changeEmail: createAction<string>(PREFIX + 'email-change'),
-    changePassword: createAction<string>(PREFIX + 'password-change'),
-    attemptLogin: createAction(PREFIX + 'login-attempt'),
-    finishLogin: createAction(PREFIX + 'login-finish'),
-    failLogin: createAction<string | null>(PREFIX + 'login-fail')
+    changeEmail: createStandardAction('login-page/email_change')<string>(),
+    changePassword: createStandardAction('login-page/password_change')<string>(),
+    attemptLogin: createStandardAction('login-page/login_attempt')(),
+    finishLogin: createStandardAction('login-page/login_finish')(),
+    failLogin: createStandardAction('login-page/login_fail')<string | null>(),
 };
 
 export const selectors = {
-    getFields: (state: LocalState) => state.fields,
-    getLoginStatus: (state: LocalState) => state.loginStatus
+    getFields: (state: LoginState) => state.fields,
+    getLoginStatus: (state: LoginState) => state.loginStatus
 };
 
-const fieldsReducer: Reducer<FieldsState> = combineReducers({
-    email: handleAction(
-        actions.changeEmail,
-        (state, {payload}) => payload!,
-        ''
-    ),
-    password: handleAction(
-        actions.changePassword,
-        (state, {payload}) => payload!,
-        ''
-    )
-});
+export type LoginAction = ActionType<typeof actions>;
 
-const loginStatusReducer: Reducer<LoginStatusState> =
-    handleActions<LoginStatusState, any>({
-        [String(actions.failLogin)]: (state, action) => ({...state, loginError: action.payload || null}),
-        [String(actions.finishLogin)]: (state, action) => ({...state, loginError: false, loginFinished: true})
-    },
-    {
-        loginError: null,
-        loginFinished: false
-    });
+const fieldsReducer = (state = {email: '', password: ''}, action: LoginAction) => {
+    switch(action.type) {
+        case getType(actions.changeEmail):
+            return {...state, email: action.payload};
+        case getType(actions.changePassword):
+            return {...state, password: action.payload};
+        default:
+            return state;
+    }
+};
 
-const reducer: Reducer<LocalState> = combineReducers({
+const loginStatusReducer = (state = {error: null, finished: false}, action: LoginAction) => {
+    switch(action.type) {
+        case getType(actions.attemptLogin):
+            return {...state, error: null};
+        case getType(actions.failLogin):
+            return {...state, error: action.payload};
+        case getType(actions.finishLogin):
+            return {...state, finished: true};
+        default:
+            return state;
+    }
+};
+
+const reducer: Reducer<LoginState> = combineReducers({
     fields: fieldsReducer,
     loginStatus: loginStatusReducer
 });

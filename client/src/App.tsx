@@ -5,10 +5,8 @@ import {BrowserRouter, Route} from 'react-router-dom';
 
 import {createStore} from './store/createStore';
 import {RootState} from './store/rootState';
-import * as actions from './store/actions';
 import DashboardLayout from './components/DashboardLayout';
 import LoginPage from './routes/guest/LoginPage/LoginPage';
-import TasksList from './TasksList/TasksList';
 
 class App extends React.Component<{}> {
 
@@ -19,10 +17,6 @@ class App extends React.Component<{}> {
         this.store = createStore();
     }
 
-    componentDidMount() {
-        this.store.dispatch(actions.loadInitialData());
-    }
-
     public render() {
         return (
             <Provider store={this.store}>
@@ -30,7 +24,7 @@ class App extends React.Component<{}> {
                     <div style={{height: '100%'}}>
                         {false && <DashboardLayout
                             menu={'menu content'}
-                            content={<TasksList/>}
+                            content={null}
                         />}
                         <Route path="/login" exact component={LoginPage}/>
                     </div>
