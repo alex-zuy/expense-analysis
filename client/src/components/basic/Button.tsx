@@ -5,39 +5,32 @@ enum ButtonKind {
     PRIMARY = 'PRIMARY'
 }
 
-interface RequiredProps {
-    children: React.ReactNode
-}
-
 interface DefaultProps {
     kind: ButtonKind,
 }
 
 interface OptionalProps {
-    disabled: boolean
+    disabled: boolean,
+    onClick: React.MouseEventHandler<HTMLButtonElement>
 }
 
-type UsableProps = Partial<OptionalProps> & RequiredProps & DefaultProps;
+type UsableProps = Partial<OptionalProps> & DefaultProps;
 
-const style: StyleSheet<UsableProps> = {
-
-};
-
-const Button = (props: UsableProps) => (
-    <button className={`pure-button ${KIND_CLASSES[props.kind]}`} disabled={props.disabled}>
+const Button: React.SFC<UsableProps> = (props) => (
+    <button
+        className={`pure-button ${KIND_CLASSES[props.kind]}`}
+        disabled={props.disabled}
+        onClick={props.onClick}>
         {props.children}
     </button>
 );
 
 Button.defaultProps = {
     kind: ButtonKind.PRIMARY
-} as DefaultProps
+}
 
 const KIND_CLASSES: Record<ButtonKind, string> = {
     [ButtonKind.PRIMARY]: 'pure-button-primary'
 };
 
-export default Button as React.StatelessComponent<
-    Partial<OptionalProps & DefaultProps>
-        & RequiredProps
->;
+export default Button as React.ComponentType<Partial<OptionalProps & DefaultProps>>;

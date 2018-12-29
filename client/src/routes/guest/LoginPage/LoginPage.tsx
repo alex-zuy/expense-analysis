@@ -1,24 +1,21 @@
 import * as React from 'react';
 import injectSheet, {StyleSheet, WithStyles} from 'react-jss';
 import {connect} from 'react-redux';
+import {Redirect, RouteComponentProps} from 'react-router';
+
+import Button from '../../../components/basic/Button';
 import {RootState} from '../../../store/rootState';
 import * as loginPageState from '../../../store/state/pages/login';
 
-import Button from '../../../components/basic/Button';
-
-interface DataProps {
-    fields: {
-        email: string,
-        password: string
-    }
-}
-
-interface CallbackProps {
+interface LoginPageProps {
+    fields: loginPageState.FieldsState,
+    loginStatus: loginPageState.LoginStatusState,
     onEmailChange: (s: string) => void,
     onPasswordChange: (s: string) => void,
+    onAttemptLogin: () => void
 }
 
-const style: StyleSheet<DataProps> = {
+const style: StyleSheet<LoginPageProps> = {
     container: {
         height: '100%',
         display: 'flex',
@@ -42,7 +39,7 @@ const style: StyleSheet<DataProps> = {
     }
 };
 
-const LoginPage = (props: DataProps & WithStyles & CallbackProps) => {
+const LoginPage: React.SFC<RouteComponentProps & LoginPageProps & WithStyles> = (props) => {
 
     const {
         classes,
@@ -52,6 +49,9 @@ const LoginPage = (props: DataProps & WithStyles & CallbackProps) => {
     return (
         <div className={classes.container}>
             <div className={`pure-form ${classes.form}`}>
+                {props.loginStatus.loginFinished && (
+                    <Redirect to="/"/>
+                )}
                 <legend className={classes.legend}>
                     Login to application
                 </legend>
@@ -72,7 +72,7 @@ const LoginPage = (props: DataProps & WithStyles & CallbackProps) => {
                     onChange={(e) => props.onPasswordChange(e.target.value)}
                 />
                 <div className={classes.submitButton}>
-                    <Button>
+                    <Button onClick={() => props.onAttemptLogin()}>
                         Login
                     </Button>
                 </div>
@@ -83,17 +83,19 @@ const LoginPage = (props: DataProps & WithStyles & CallbackProps) => {
 
 const LoginPageStyled = injectSheet(style)(LoginPage);
 
-const mapState = (state: RootState): DataProps => {
+const mapState = (state: RootState) => {
     const slice = state.pages.login;
 
     return {
         fields: loginPageState.selectors.getFields(slice),
+        loginStatus: loginPageState.selectors.getLoginStatus(slice)
     }
 }
 
-const mapDispatch: CallbackProps = {
+const mapDispatch = {
     onEmailChange: loginPageState.actions.changeEmail,
-    onPasswordChange: loginPageState.actions.changePassword
+    onPasswordChange: loginPageState.actions.changePassword,
+    onAttemptLogin: loginPageState.actions.attemptLogin
 };
 
 export default connect(mapState, mapDispatch)(LoginPageStyled);
