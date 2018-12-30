@@ -9,10 +9,9 @@ import * as passport from 'passport';
 import {createConnection} from 'typeorm';
 import {createServices} from './appConfig/createServices';
 import {configurePassport} from './appConfig/passport/configurePassport';
-import {loginHandler} from './appConfig/passport/loginHandler';
+import {login as loginHandler} from './controllers/login';
+import {requireAuthentication, authorizationErrorHandler} from './middleware/authentication';
 import {BcryptPasswordHashingHandler} from './PasswordHashingHandler';
-
-const app = express();
 
 const typeDefs = gql`
     type User {
@@ -31,10 +30,6 @@ const resolvers = {
     },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
-
-app.use(morgan('dev'));
-
 createConnection()
     .then((connection) => {
         const passwordHashingHandler = new BcryptPasswordHashingHandler();
@@ -43,6 +38,9 @@ createConnection()
 
         configurePassport(passport, services.authenticationService);
 
+        const app = express();
+
+        app.use(morgan('dev'));
         app.use(expressSession({secret: 'cats', resave: false, saveUninitialized: false}));
         app.use(bodyParser.urlencoded({extended: false}));
         app.use(passport.initialize());
@@ -50,10 +48,15 @@ createConnection()
 
         app.post('/login', loginHandler);
 
-        server.applyMiddleware({app});
+        const apollo = new ApolloServer({ typeDefs, resolvers });
+
+        app.use(apollo.graphqlPath, requireAuthentication);
+        apollo.applyMiddleware({app});
+
+        app.use(authorizationErrorHandler);
 
         const port = process.env.LISTENING_PORT;
         app.listen(port, () => {
-            console.log(`Listening at ${port}. GraphQL available at '${server.graphqlPath}'`);
+            console.log(`Listening at ${port}. GraphQL available at '${apollo.graphqlPath}'`);
         });
     });

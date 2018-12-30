@@ -1,9 +1,9 @@
 import {RequestHandler} from 'express';
 import * as passport from 'passport';
-import User from '../../entities/User';
-import {InfoData} from './DbLocalStrategy';
+import User from '../entities/User';
+import {InfoData} from '../appConfig/passport/DbLocalStrategy';
 
-export const loginHandler: RequestHandler = (req, res, next) => {
+export const login: RequestHandler = (req, res, next) => {
 
     passport.authenticate('local',
 
@@ -14,13 +14,17 @@ export const loginHandler: RequestHandler = (req, res, next) => {
                     ? info.message
                     : (err ? err.message : 'Unknown error');
 
-                res.status(401)
+                res.status(400)
                     .json({message})
                     .end();
             } else {
                 req.login(user, (err?: Error) => {
-                    res.status(200)
-                        .end();
+                    if(err) {
+                        next(err);
+                    } else {
+                        res.status(200)
+                            .end();
+                    }
                 });
             }
         }
