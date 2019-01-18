@@ -1,42 +1,28 @@
-import {ApolloServer, gql} from 'apollo-server-express';
 import * as bodyParser from 'body-parser';
-
+import * as cors from 'cors';
 import * as express from 'express';
 import * as expressSession from 'express-session';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
-
 import {createConnection} from 'typeorm';
-import {createServices} from './appConfig/createServices';
 import {configurePassport} from './appConfig/passport/configurePassport';
+import createGraphQlHandler from './controllers/graphQL';
 import {login as loginHandler} from './controllers/login';
-import {requireAuthentication, authorizationErrorHandler} from './middleware/authentication';
+import User from './entities/User';
+import {createGraphQlSchema} from './graphql/createSchema';
+import {authorizationErrorHandler, requireAuthentication} from './middleware/authentication';
 import {BcryptPasswordHashingHandler} from './PasswordHashingHandler';
-
-const typeDefs = gql`
-    type User {
-        id: Int
-        email: String
-    }
-    
-    type Query {
-        self: User
-    }
-`;
-
-const resolvers = {
-    Query: {
-        self: () => ({id: 1, email: 'em'}),
-    },
-};
+import AuthenticationService from './services/AuthenticationService';
 
 createConnection()
-    .then((connection) => {
-        const passwordHashingHandler = new BcryptPasswordHashingHandler();
+    .then(async (connection) => {
+        {
+            const userRepository = connection.getRepository(User);
+            const passwordHashingHandler = new BcryptPasswordHashingHandler();
+            const authenticationService = new AuthenticationService(userRepository, passwordHashingHandler);
 
-        const services = createServices(connection, passwordHashingHandler);
-
-        configurePassport(passport, services.authenticationService);
+            configurePassport(passport, authenticationService);
+        }
 
         const app = express();
 
@@ -48,15 +34,14 @@ createConnection()
 
         app.post('/login', loginHandler);
 
-        const apollo = new ApolloServer({ typeDefs, resolvers });
-
-        app.use(apollo.graphqlPath, requireAuthentication);
-        apollo.applyMiddleware({app});
+        const GRAPHQL_PATH = '/graphql';
+        app.use(GRAPHQL_PATH, requireAuthentication);
+        app.use(GRAPHQL_PATH, cors(), createGraphQlHandler(connection, await createGraphQlSchema()));
 
         app.use(authorizationErrorHandler);
 
         const port = process.env.LISTENING_PORT;
         app.listen(port, () => {
-            console.log(`Listening at ${port}. GraphQL available at '${apollo.graphqlPath}'`);
+            console.log(`Listening at ${port}. GraphQL available at '${GRAPHQL_PATH}'`);
         });
     });

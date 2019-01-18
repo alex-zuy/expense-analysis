@@ -1,19 +1,15 @@
-import {Connection} from 'typeorm';
+import {EntityManager} from 'typeorm';
 import User from '../entities/User';
-import {PasswordHashingHandler} from '../PasswordHashingHandler';
-import AuthenticationService from '../services/AuthenticationService';
 import UsersService from '../services/UsersService';
 
-export const createServices = (dbConnection: Connection, passwordHashingHandler: PasswordHashingHandler) => {
+export const createServices = (entityManager: EntityManager, currentUser: User) => {
+    const usersRepository = entityManager.getRepository(User);
 
-    const usersRepository = dbConnection.getRepository(User);
-
-    const usersService = new UsersService(usersRepository);
-
-    const authenticationService = new AuthenticationService(usersRepository, passwordHashingHandler);
+    const usersService = new UsersService(usersRepository, currentUser);
 
     return {
         usersService,
-        authenticationService
     };
 };
+
+export type ApplicationServices = ReturnType<typeof createServices>;

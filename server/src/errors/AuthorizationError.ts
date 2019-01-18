@@ -6,7 +6,7 @@ export default class AuthorizationError implements Error {
 
     constructor(message: string) {
         const error = Error(message);
-        copyOwnPropertiesFrom(this, error as any);
+        copyOwnPropertiesFrom(this, error);
     }
 }
 
