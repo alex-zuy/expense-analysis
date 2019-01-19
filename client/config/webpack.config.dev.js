@@ -140,21 +140,20 @@ module.exports = {
               name: 'static/media/[name].[hash:8].[ext]',
             },
           },
-          {
-            test: /\.(js|jsx|mjs)$/,
-            include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-
-              compact: true,
-            },
-          },
-
           // Compile .tsx?
           {
             test: /\.(ts|tsx)$/,
             include: paths.appSrc,
             use: [
+                {
+                    loader: require.resolve('babel-loader'),
+                    options: {
+                        compact: true,
+                        plugins: [
+                            ['relay', { 'artifactDirectory': './src/__generated__' }]
+                        ]
+                    }
+                },
               {
                 loader: require.resolve('ts-loader'),
                 options: {

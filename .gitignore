@@ -22,3 +22,6 @@ yarn-error.log*
 
 .idea/
 /server/.env
+/graphql.schema.json
+/graphql.config.json
+/client/src/__generated__/

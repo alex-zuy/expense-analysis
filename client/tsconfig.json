@@ -4,7 +4,9 @@
     "baseUrl": ".",
     "outDir": "build/dist",
     "rootDir": "src",
-    "lib": ["es6", "dom"]
+    "target": "es2015",
+    "module": "es2015",
+    "lib": ["es6", "dom", "esnext.asynciterable"]
   },
   "exclude": [
     "node_modules",
