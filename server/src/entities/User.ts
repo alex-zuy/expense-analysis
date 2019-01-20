@@ -9,6 +9,9 @@ export default class User {
     @Column()
     email: string;
 
+    @Column({name: 'full_name'})
+    fullName: string;
+
     @Column({select: false})
     password: string;
 }
