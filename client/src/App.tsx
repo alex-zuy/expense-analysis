@@ -1,16 +1,15 @@
 import * as React from 'react';
-import {combineReducers, Store} from 'redux';
-import {connect, Provider} from 'react-redux';
+import {Provider} from 'react-redux';
 import {BrowserRouter, Route} from 'react-router-dom';
+import {Store} from 'redux';
 import {Environment} from 'relay-runtime';
-import CurrentUser from './components/CurrentUser';
+import {createEnvironment} from './graphql/createEnvironment';
+import EnvironmentContext from './graphql/environmentContext';
+import LoginPage from './routes/guest/LoginPage/LoginPage';
+import Dashboard from './routes/user/Dashboard';
 
 import {createStore} from './store/createStore';
 import {RootState} from './store/rootState';
-import DashboardLayout from './components/DashboardLayout';
-import LoginPage from './routes/guest/LoginPage/LoginPage';
-import {createEnvironment} from './graphql/createEnvironment';
-import GraphQlContext from './context/graphql';
 
 class App extends React.Component<{}> {
 
@@ -26,20 +25,14 @@ class App extends React.Component<{}> {
     public render() {
         return (
             <Provider store={this.store}>
-                <GraphQlContext.Provider value={this.graphQlEnvironment}>
+                <EnvironmentContext.Provider value={this.graphQlEnvironment}>
                     <BrowserRouter>
                         <div style={{height: '100%'}}>
-                            <Route path="/" exact component={() => (
-                                <DashboardLayout
-                                    menu={<CurrentUser/>}
-                                    content={null}
-                                />
-                            )}>
-                            </Route>
+                            <Route path="/" exact component={Dashboard}/>
                             <Route path="/login" exact component={LoginPage}/>
                         </div>
                     </BrowserRouter>
-                </GraphQlContext.Provider>
+                </EnvironmentContext.Provider>
             </Provider>
         );
     }

@@ -6,3 +6,11 @@ export const login = (email: string, password: string) => {
     params.append('password', password);
     return axios.post('/login', params);
 }
+
+export interface IsLoggedInResponse {
+    isLoggedIn: boolean
+}
+
+export const isLoggedIn = () => {
+    return axios.get<IsLoggedInResponse>('/loggedIn');
+};

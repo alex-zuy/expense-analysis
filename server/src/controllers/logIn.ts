@@ -3,7 +3,7 @@ import * as passport from 'passport';
 import User from '../entities/User';
 import {InfoData} from '../appConfig/passport/DbLocalStrategy';
 
-export const login: RequestHandler = (req, res, next) => {
+export const logIn: RequestHandler = (req, res, next) => {
 
     passport.authenticate('local',
 

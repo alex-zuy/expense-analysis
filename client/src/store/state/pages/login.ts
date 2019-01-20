@@ -6,14 +6,9 @@ export interface FieldsState {
     password: string,
 }
 
-export interface StatusState {
-    error: string | null,
-    finished: boolean
-}
-
 export interface LoginState {
     fields: FieldsState,
-    loginStatus: StatusState
+    loginError: string | null
 }
 
 export const actions = {
@@ -26,30 +21,32 @@ export const actions = {
 
 export const selectors = {
     getFields: (state: LoginState) => state.fields,
-    getLoginStatus: (state: LoginState) => state.loginStatus
+    getLoginError: (state: LoginState) => state.loginError
 };
 
 export type LoginAction = ActionType<typeof actions>;
 
-const fieldsReducer = (state = {email: '', password: ''}, action: LoginAction) => {
+const INITIAL_FIELDS_STATE = {email: '', password: ''};
+const fieldsReducer = (state = INITIAL_FIELDS_STATE, action: LoginAction) => {
     switch(action.type) {
         case getType(actions.changeEmail):
             return {...state, email: action.payload};
         case getType(actions.changePassword):
             return {...state, password: action.payload};
+        case getType(actions.finishLogin):
+            return INITIAL_FIELDS_STATE;
         default:
             return state;
     }
 };
 
-const loginStatusReducer = (state = {error: null, finished: false}, action: LoginAction) => {
+const loginStatusReducer = (state = null, action: LoginAction) => {
     switch(action.type) {
-        case getType(actions.attemptLogin):
-            return {...state, error: null};
-        case getType(actions.failLogin):
-            return {...state, error: action.payload};
         case getType(actions.finishLogin):
-            return {...state, finished: true};
+        case getType(actions.attemptLogin):
+            return null;
+        case getType(actions.failLogin):
+            return action.payload;
         default:
             return state;
     }
@@ -57,7 +54,7 @@ const loginStatusReducer = (state = {error: null, finished: false}, action: Logi
 
 const reducer: Reducer<LoginState> = combineReducers({
     fields: fieldsReducer,
-    loginStatus: loginStatusReducer
+    loginError: loginStatusReducer
 });
 
 export default reducer;

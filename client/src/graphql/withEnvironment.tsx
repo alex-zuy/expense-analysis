@@ -1,7 +1,8 @@
 import * as React from 'react';
 import {Environment} from 'relay-runtime';
 import {Omit} from 'utility-types';
-import GraphQlContext from '../context/graphql';
+import {setHocDisplayName} from '../components/hoc/setHocDisplayName';
+import Context from './environmentContext';
 
 export interface ProvidedEnvironmentProps {
     environment: Environment
@@ -15,17 +16,14 @@ export const withEnvironment =
         const Receiver = component;
 
         const hoc = () => (
-            <GraphQlContext.Consumer>
+            <Context.Consumer>
                 {(environment) => (
                     <Receiver environment={environment}/>
                 )}
-            </GraphQlContext.Consumer>
+            </Context.Consumer>
         );
 
-        hoc.displayName = `${withEnvironment.name}(${getDisplayName(component)})`;
+        setHocDisplayName(component, hoc, withEnvironment);
 
         return hoc;
     };
-
-const getDisplayName = (component: React.ComponentType) =>
-    component.displayName || component.name || 'Component';

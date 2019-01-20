@@ -7,7 +7,8 @@ import * as passport from 'passport';
 import {createConnection} from 'typeorm';
 import {configurePassport} from './appConfig/passport/configurePassport';
 import createGraphQlHandler from './controllers/graphQL';
-import {login as loginHandler} from './controllers/login';
+import {logIn as loginHandler} from './controllers/logIn';
+import {isLoggedIn} from './controllers/isLoggedIn';
 import User from './entities/User';
 import {createGraphQlSchema} from './graphql/createSchema';
 import {authorizationErrorHandler, requireAuthentication} from './middleware/authentication';
@@ -34,6 +35,7 @@ createConnection()
         app.use(passport.session());
 
         app.post('/login', loginHandler);
+        app.get('/loggedIn', isLoggedIn);
 
         const GRAPHQL_PATH = '/graphql';
         app.use(GRAPHQL_PATH, requireAuthentication);

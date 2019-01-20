@@ -6,10 +6,15 @@ import {Redirect, RouteComponentProps} from 'react-router';
 import Button from '../../../components/basic/Button';
 import {RootState} from '../../../store/rootState';
 import * as loginPageState from '../../../store/state/pages/login';
+import * as isLoggedInState from '../../../store/state/isLoggedIn';
 
 interface LoginPageProps {
     fields: loginPageState.FieldsState,
-    loginStatus: loginPageState.StatusState,
+    loginError: string | null,
+    isLoggedIn: {
+        isLoaded: boolean,
+        isLoggedIn: boolean
+    }
     onEmailChange: (s: string) => void,
     onPasswordChange: (s: string) => void,
     onAttemptLogin: () => void
@@ -43,15 +48,19 @@ const LoginPage: React.SFC<RouteComponentProps & LoginPageProps & WithStyles> = 
 
     const {
         classes,
-        fields
+        fields,
+        isLoggedIn
     } = props;
 
-    return (
+    const onKeyPress: React.KeyboardEventHandler = (e) => {
+        if(e.key === 'Enter') {
+            props.onAttemptLogin();
+        }
+    };
+
+    const renderLoginForm = () => (
         <div className={classes.container}>
-            <div className={`pure-form ${classes.form}`}>
-                {props.loginStatus.finished && (
-                    <Redirect to="/"/>
-                )}
+            <div className={`pure-form ${classes.form}`} onKeyPress={onKeyPress}>
                 <legend className={classes.legend}>
                     Login to application
                 </legend>
@@ -78,7 +87,17 @@ const LoginPage: React.SFC<RouteComponentProps & LoginPageProps & WithStyles> = 
                 </div>
             </div>
         </div>
-    )
+    );
+
+    if(isLoggedIn.isLoaded) {
+        if(isLoggedIn.isLoggedIn) {
+            return <Redirect to="/"/>;
+        } else {
+            return renderLoginForm();
+        }
+    } else {
+        return null;
+    }
 };
 
 const LoginPageStyled = injectSheet(style)(LoginPage);
@@ -88,7 +107,8 @@ const mapState = (state: RootState) => {
 
     return {
         fields: loginPageState.selectors.getFields(slice),
-        loginStatus: loginPageState.selectors.getLoginStatus(slice)
+        loginError: loginPageState.selectors.getLoginError(slice),
+        isLoggedIn: isLoggedInState.selectors.getStatus(state.isLoggedIn)
     }
 }
 
