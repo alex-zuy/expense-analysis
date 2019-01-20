@@ -30,14 +30,6 @@ const currentUserInfoStyles: StyleSheet<CurrentUserInfoProps> = {
     },
     userEmail: {
         fontSize: '0.8em'
-    },
-    avatarWrapper: {
-        paddingBottom: '100%',
-        width: '100%',
-        position: 'relative',
-    },
-    avatarIcon: {
-        position: 'absolute',
     }
 };
 
@@ -45,16 +37,13 @@ const CurrentUserInfo: React.SFC<CurrentUserInfoProps & WithStyles> = (props) =>
     const {user, classes} = props;
     return (
         <div className={classes.container}>
-            <div className={classes.avatarWrapper}>
-                <FontAwesomeIcon
-                    icon={faUserCircle}
-                    className={classes.avatarIcon}
-                    style={{
-                        width: '100%',
-                        height: '100%'
-                    }}
-                />
-            </div>
+            <FontAwesomeIcon
+                icon={faUserCircle}
+                style={{
+                    width: '6em',
+                    height: '6em'
+                }}
+            />
             <div className={classes.footer}>
                 <div className={classes.userFullName}>{user.fullName}</div>
                 <div className={classes.userEmail}>{user.email}</div>
