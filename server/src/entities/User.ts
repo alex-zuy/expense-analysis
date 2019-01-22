@@ -1,4 +1,5 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import ShopAccount from './ShopAccount';
 
 @Entity({name: 'users'})
 export default class User {
@@ -14,4 +15,10 @@ export default class User {
 
     @Column({select: false})
     password: string;
+
+    @OneToOne(type => ShopAccount, (shopAccount) => shopAccount.user, {
+        lazy: true,
+        nullable: true
+    })
+    shopAccount: Promise<ShopAccount>;
 }

@@ -1,15 +1,14 @@
+import {faUserCircle} from '@fortawesome/free-solid-svg-icons'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import * as React from 'react';
-import injectStyles, {WithStyles, StyleSheet} from 'react-jss';
-import {graphql, QueryRenderer} from 'react-relay';
-import {Environment} from 'relay-runtime';
-import {$PropertyType} from 'utility-types';
+import injectStyles, {StyleSheet, WithStyles} from 'react-jss';
+import {createFragmentContainer, graphql, QueryRenderer} from 'react-relay';
 import {CurrentUser_self_QueryResponse} from '../__generated__/CurrentUser_self_Query.graphql';
+import {CurrentUser_user} from '../__generated__/CurrentUser_user.graphql';
 import {ProvidedEnvironmentProps, withEnvironment} from '../graphql/withEnvironment';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons'
 
 interface CurrentUserInfoProps {
-    user: $PropertyType<CurrentUser_self_QueryResponse, 'self'>,
+    user: CurrentUser_user
 }
 
 const currentUserInfoStyles: StyleSheet<CurrentUserInfoProps> = {
@@ -52,7 +51,15 @@ const CurrentUserInfo: React.SFC<CurrentUserInfoProps & WithStyles> = (props) =>
     )
 }
 
-const CurrentUserInfoStyled = injectStyles(currentUserInfoStyles)(CurrentUserInfo);
+const CurrentUserInfoFragment = createFragmentContainer(
+    injectStyles(currentUserInfoStyles)(CurrentUserInfo),
+    graphql`
+        fragment CurrentUser_user on User {
+            email
+            fullName
+        }
+    `
+);
 
 const CurrentUser: React.SFC<ProvidedEnvironmentProps> = (props) => (
     <QueryRenderer
@@ -60,15 +67,13 @@ const CurrentUser: React.SFC<ProvidedEnvironmentProps> = (props) => (
         query={graphql`
             query CurrentUser_self_Query {
                 self {
-                    id
-                    email
-                    fullName
+                    ...CurrentUser_user
                 }
             }
         `}
         variables={{}}
         render={({error, props}: {error: any, props: CurrentUser_self_QueryResponse}) => (
-            props && <CurrentUserInfoStyled user={props.self}/>
+            props && <CurrentUserInfoFragment user={props.self}/>
         )}
     />
 );

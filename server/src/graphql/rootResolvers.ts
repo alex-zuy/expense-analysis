@@ -1,18 +1,25 @@
 import {ApplicationServices} from '../appConfig/createServices';
-import User from '../entities/User';
+import {UpdateAccountFields} from '../services/ShopAccountsService';
+import {parseNodeId} from './node';
+import {createShopAccountNode, ShopAccountNode} from './nodes/shopAccountNode';
+import {createUserNode, UserNode} from './nodes/userNode';
+import {ResolverFunc} from './resolver';
 
-export interface ResolverContext {
-    services: ApplicationServices
-}
-
-interface ResolverFunc<ResultType, ParentObjType = null, FieldArgsType = {}> {
-    (parent: ParentObjType, context: ResolverContext, args: FieldArgsType): ResultType | Promise<ResultType>
-}
-
-const self: ResolverFunc<User> = (obj, {services}, args) => {
-    return services.usersService.getCurrentUser();
+const self: ResolverFunc<UserNode> = async (obj, {services}, args) => {
+    return createUserNode(await services.usersService.getCurrentUser());
 };
 
+type UpdateShopAccountInput = UpdateAccountFields & {id: string | null};
+
+const updateShopAccount: ResolverFunc<ShopAccountNode, undefined, {variableValues: {input: UpdateShopAccountInput}}> =
+    async (obj, {services}, args) => {
+        const {id, ...rest} = args.variableValues.input;
+        const realId = id ? parseNodeId(id).id : null;
+        const account = await services.shopAccountsService.createOrUpdateShopAccount(realId, rest);
+        return createShopAccountNode(account);
+    }
+
 export default {
-    self
+    self,
+    updateShopAccount
 };

@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {Provider} from 'react-redux';
-import {BrowserRouter, Route} from 'react-router-dom';
+import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {Store} from 'redux';
 import {Environment} from 'relay-runtime';
 import {createEnvironment} from './graphql/createEnvironment';
 import EnvironmentContext from './graphql/environmentContext';
 import LoginPage from './routes/guest/LoginPage/LoginPage';
-import Dashboard from './routes/user/Dashboard';
+import DashboardPage from './routes/user/DashboardPage';
 
 import {createStore} from './store/createStore';
 import {RootState} from './store/rootState';
@@ -28,8 +28,10 @@ class App extends React.Component<{}> {
                 <EnvironmentContext.Provider value={this.graphQlEnvironment}>
                     <BrowserRouter>
                         <div style={{height: '100%'}}>
-                            <Route path="/" exact component={Dashboard}/>
-                            <Route path="/login" exact component={LoginPage}/>
+                            <Switch>
+                                <Route path="/login" component={LoginPage}/>
+                                <Route path="/" component={DashboardPage}/>
+                            </Switch>
                         </div>
                     </BrowserRouter>
                 </EnvironmentContext.Provider>

@@ -2,6 +2,7 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as express from 'express';
 import * as expressSession from 'express-session';
+import * as sessionFileStore from 'session-file-store';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
 import {createConnection} from 'typeorm';
@@ -28,7 +29,15 @@ createConnection()
         const app = express();
 
         app.use(morgan('dev'));
-        app.use(expressSession({secret: 'cats', resave: false, saveUninitialized: false}));
+        const FileStore = sessionFileStore(expressSession);
+        app.use(expressSession({
+            store: new FileStore({
+                path: './.sessions'
+            }),
+            secret: 'cats',
+            resave: false,
+            saveUninitialized: false
+        }));
         app.use(bodyParser.urlencoded({extended: false}));
         app.use(bodyParser.json());
         app.use(passport.initialize());

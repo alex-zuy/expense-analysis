@@ -16,9 +16,15 @@ interface OptionalProps {
 
 type UsableProps = Partial<OptionalProps> & DefaultProps;
 
-const Button: React.SFC<UsableProps> = (props) => (
+const buttonStyles: StyleSheet<UsableProps> = {
+    button: {
+        width: '100%'
+    }
+};
+
+const Button: React.SFC<UsableProps & WithStyles> = (props) => (
     <button
-        className={`pure-button ${KIND_CLASSES[props.kind]}`}
+        className={`pure-button ${KIND_CLASSES[props.kind]} ${props.classes.button}`}
         disabled={props.disabled}
         onClick={props.onClick}>
         {props.children}
@@ -33,4 +39,4 @@ const KIND_CLASSES: Record<ButtonKind, string> = {
     [ButtonKind.PRIMARY]: 'pure-button-primary'
 };
 
-export default Button as React.ComponentType<Partial<OptionalProps & DefaultProps>>;
+export default injectSheet(buttonStyles)(Button) as React.ComponentType<Partial<OptionalProps & DefaultProps>>;

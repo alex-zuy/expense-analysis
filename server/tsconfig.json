@@ -2,7 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "build",
-    "rootDir": "src",
+    "rootDir": ".",
     "lib": ["es2015", "es2016", "es2017", "esnext.asynciterable"],
     "module": "commonjs",
     "emitDecoratorMetadata": true,

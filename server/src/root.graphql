@@ -1,9 +1,31 @@
+type ShopAccount {
+    id: ID!
+    login: String!
+    accessToken: String!
+    expiresAt: Date!
+    updatedAt: Date!
+}
+
 type User {
-    id: ID
+    id: ID!
     email: String!
     fullName: String!
+    shopAccount: ShopAccount
 }
 
 type Query {
     self: User!
 }
+
+input ShopAccountUpdateInput {
+    id: ID
+    login: String!
+    accessToken: String!
+    expiresAt: String!
+}
+
+type Mutation {
+    updateShopAccount(input: ShopAccountUpdateInput!): ShopAccount!
+}
+
+scalar Date
