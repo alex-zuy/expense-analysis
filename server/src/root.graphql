@@ -13,8 +13,15 @@ type User {
     shopAccount: ShopAccount
 }
 
+type ShopAccountCheckResult {
+    isSuccess: Boolean!
+    error: String
+    userName: String
+}
+
 type Query {
     self: User!
+    shopAccountCheck(accessToken: String!): ShopAccountCheckResult!
 }
 
 input ShopAccountUpdateInput {

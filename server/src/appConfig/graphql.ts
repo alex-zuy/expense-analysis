@@ -6,7 +6,7 @@ import * as util from 'util';
 
 const fsReadFile = util.promisify(fs.readFile);
 
-export const createGraphQlSchema = async () => {
+export const createSchema = async () => {
     const schemaFilePath = path.join(__dirname, '../root.graphql');
     const buffer = await fsReadFile(schemaFilePath, null);
     const schema = buildSchema(buffer.toString('UTF-8'));

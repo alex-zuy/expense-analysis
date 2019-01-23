@@ -11,7 +11,7 @@ import createGraphQlHandler from './controllers/graphQL';
 import {logIn as loginHandler} from './controllers/logIn';
 import {isLoggedIn} from './controllers/isLoggedIn';
 import User from './entities/User';
-import {createGraphQlSchema} from './graphql/createSchema';
+import {createSchema as createGraphQlSchema} from './appConfig/graphql';
 import {authorizationErrorHandler, requireAuthentication} from './middleware/authentication';
 import {BcryptPasswordHashingHandler} from './PasswordHashingHandler';
 import AuthenticationService from './services/AuthenticationService';

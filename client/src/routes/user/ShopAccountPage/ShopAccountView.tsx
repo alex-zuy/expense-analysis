@@ -3,6 +3,7 @@ import injectSheet, {StyleSheet, WithStyles} from 'react-jss';
 import {createFragmentContainer, graphql} from 'react-relay';
 import {ShopAccountView_account} from '../../../__generated__/ShopAccountView_account.graphql';
 import Button from '../../../components/basic/Button';
+import ShopAccountChecker from './ShopAccountChecker';
 
 interface AccountFields extends Pick<ShopAccountView_account, 'login' | 'accessToken' | 'expiresAt'> { }
 
@@ -19,7 +20,7 @@ const shopAccountStyles: StyleSheet<ShopAccountViewProps> = {
         gridGap: '.6em'
     },
     submitButtonWrapper: {
-        gridColumn: '2 / 3'
+        gridColumn: '2 / 3',
     }
 };
 
@@ -99,6 +100,7 @@ class ShopAccountView extends React.Component<ShopAccountViewProps & WithStyles,
                         <Button onClick={this._handleSave}>
                             Save
                         </Button>
+                        <ShopAccountChecker accessToken={this.state.accessToken}/>
                     </div>
                 </div>
             </>

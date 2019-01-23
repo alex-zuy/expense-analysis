@@ -1,9 +1,9 @@
 import User from '../../entities/User';
 import {EntityNode, pickSimpleEntityProps} from '../node';
-import {MemberResolverFunc} from '../resolver';
+import {ResolverFunc} from '../resolver';
 import {createShopAccountNode, ShopAccountNode} from './shopAccountNode';
 
-const shopAccount: MemberResolverFunc<ShopAccountNode | null, UserNode> = async function(ctx, args) {
+const shopAccount: ResolverFunc<ShopAccountNode | null, UserNode> = async function(args, ctx) {
     const account = await this.entity.shopAccount;
     return account ? createShopAccountNode(account) : null;
 }

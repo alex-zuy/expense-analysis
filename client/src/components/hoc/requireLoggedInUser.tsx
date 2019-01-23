@@ -5,6 +5,10 @@ import {RootState} from '../../store/rootState';
 import * as isLoggedInState from '../../store/state/isLoggedIn';
 import {setHocDisplayName} from './setHocDisplayName';
 
+const mapState = (state: RootState) => {
+    return isLoggedInState.selectors.getStatus(state.isLoggedIn);
+}
+
 export const requireLoggedInUser = <T extends {}>(
     component: React.ComponentType<T>
 ): React.ComponentType<T> => {
@@ -27,10 +31,6 @@ export const requireLoggedInUser = <T extends {}>(
     }
 
     setHocDisplayName(component, hoc, requireLoggedInUser);
-
-    const mapState = (state: RootState) => {
-        return isLoggedInState.selectors.getStatus(state.isLoggedIn);
-    }
 
     return connect(mapState)(hoc) as any;
 };
