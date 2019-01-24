@@ -1,15 +1,12 @@
 import {GraphQLResolveInfo} from 'graphql';
+import {IFieldResolver} from 'graphql-tools';
 import {ApplicationServices} from '../appConfig/createServices';
+import User from '../entities/User';
 
 export interface ResolverContext {
+    currentUser: User,
     services: ApplicationServices
 }
 
-export interface ResolverFunc<ResultType, ParentObjType = undefined, FieldArgsType = {}> {
-    (
-        this: ParentObjType,
-        args: FieldArgsType,
-        context: ResolverContext,
-        info: GraphQLResolveInfo
-    ): ResultType | Promise<ResultType>
-}
+export interface ResolverFunc<ResultType, ParentObjType = undefined, FieldArgsType = {}>
+    extends IFieldResolver<ParentObjType, ResolverContext, FieldArgsType> {}

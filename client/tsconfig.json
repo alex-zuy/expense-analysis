@@ -6,7 +6,7 @@
     "rootDir": "src",
     "target": "es2015",
     "module": "es2015",
-    "lib": ["es6", "dom", "esnext.asynciterable"]
+    "lib": ["es6", "dom", "esnext.asynciterable", "es2016"]
   },
   "exclude": [
     "node_modules",

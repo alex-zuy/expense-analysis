@@ -5,7 +5,7 @@ type PropertyChecker<P> = <K extends keyof P>(propName: K, callback: ChangeCallb
 export const propsCompare = <P extends object>(nextProps: P, prevProps: P): PropertyChecker<P> => {
     return (propName, callback) => {
         const next = nextProps[propName];
-        const prev = nextProps[propName];
+        const prev = prevProps[propName];
         if(next !== prev) {
             callback(next, prev);
         }

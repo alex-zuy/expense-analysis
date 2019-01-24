@@ -1,18 +1,18 @@
 import * as React from 'react';
 import injectSheet, {StyleSheet, WithStyles} from 'react-jss';
-import {createFragmentContainer, graphql} from 'react-relay';
+import {commitMutation, createFragmentContainer, graphql} from 'react-relay';
+import {Environment} from 'relay-runtime';
 import {ShopAccountView_account} from '../../../__generated__/ShopAccountView_account.graphql';
 import Button from '../../../components/basic/Button';
+import {ProvidedEnvironmentProps, withEnvironment} from '../../../graphql/withEnvironment';
 import ShopAccountChecker from './ShopAccountChecker';
+import {ShopAccountUpdateInput} from 'src/__generated__/ShopAccountView_accountUpdate_Mutation.graphql';
 
-interface AccountFields extends Pick<ShopAccountView_account, 'login' | 'accessToken' | 'expiresAt'> { }
-
-interface ShopAccountViewProps {
-    account: ShopAccountView_account | null,
-    onSave(fields: AccountFields & {id: string | null}): void
+interface ViewProps extends ProvidedEnvironmentProps {
+    account: ShopAccountView_account | null
 }
 
-const shopAccountStyles: StyleSheet<ShopAccountViewProps> = {
+const shopAccountStyles: StyleSheet<ViewProps> = {
     form: {
         marginTop: '1em',
         display: 'grid',
@@ -24,11 +24,11 @@ const shopAccountStyles: StyleSheet<ShopAccountViewProps> = {
     }
 };
 
-interface ShopAccountViewState extends AccountFields { }
+interface ViewState extends ShopAccountUpdateInput { }
 
-class ShopAccountView extends React.Component<ShopAccountViewProps & WithStyles, ShopAccountViewState> {
+class ShopAccountView extends React.Component<ViewProps & WithStyles, ViewState> {
 
-    constructor(props: ShopAccountViewProps & WithStyles) {
+    constructor(props: ViewProps & WithStyles) {
         super(props);
         const {account} = props;
         if(account) {
@@ -56,8 +56,7 @@ class ShopAccountView extends React.Component<ShopAccountViewProps & WithStyles,
         this.setState({expiresAt});
 
     _handleSave = () => {
-        const {account} = this.props;
-        this.props.onSave({...this.state, id: account ? account.id : null});
+        updateShopAccount(this.props.environment, this.state);
     }
 
     render() {
@@ -65,7 +64,7 @@ class ShopAccountView extends React.Component<ShopAccountViewProps & WithStyles,
         const {classes} = props;
         return (
             <>
-                <h3>Shop accounts</h3>
+                <h1>Shop accounts</h1>
                 <div>
                     You need to provide shop account in order for
                     system to fetch your shopping history
@@ -109,7 +108,7 @@ class ShopAccountView extends React.Component<ShopAccountViewProps & WithStyles,
 }
 
 export default createFragmentContainer(
-    injectSheet(shopAccountStyles)(ShopAccountView),
+    withEnvironment(injectSheet(shopAccountStyles)(ShopAccountView)),
     graphql`
         fragment ShopAccountView_account on ShopAccount {
             id
@@ -120,3 +119,28 @@ export default createFragmentContainer(
         }
     `
 );
+
+const updateShopAccount = async (environment: Environment, input: ShopAccountUpdateInput) => {
+    return new Promise((resolve, reject) => {
+        commitMutation(
+            environment,
+            {
+                mutation: graphql`
+                    mutation ShopAccountView_accountUpdate_Mutation($input: ShopAccountUpdateInput!) {
+                        updateShopAccount(input: $input) {
+                            ...ShopAccountView_account
+                        }
+                    }
+                `,
+                variables: {input},
+                onCompleted: (response, errors) => {
+                    if(errors) {
+                        reject(errors);
+                    } else {
+                        resolve(response);
+                    }
+                }
+            }
+        )
+    });
+};

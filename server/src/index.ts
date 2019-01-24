@@ -5,6 +5,7 @@ import * as expressSession from 'express-session';
 import * as sessionFileStore from 'session-file-store';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
+import * as multer from 'multer';
 import {createConnection} from 'typeorm';
 import {configurePassport} from './appConfig/passport/configurePassport';
 import createGraphQlHandler from './controllers/graphQL';
@@ -40,6 +41,7 @@ createConnection()
         }));
         app.use(bodyParser.urlencoded({extended: false}));
         app.use(bodyParser.json());
+        app.use(multer().none());
         app.use(passport.initialize());
         app.use(passport.session());
 

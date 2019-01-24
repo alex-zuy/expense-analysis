@@ -10,16 +10,19 @@ const createHandler = (dbConnection: Connection, schema: GraphQLSchema): Request
     (req, res) => {
         dbConnection.manager.transaction('SERIALIZABLE', async (entityManger) => {
 
+            //TODO: find a way to catch exceptions that happened inside GraphQl resolvers code
             await graphqlMiddleware((req, res, graphQLParams) => {
 
+                const {user} = req;
+
                 const context: ResolverContext = {
-                    services: createServices(entityManger, req.user)
+                    currentUser: user,
+                    services: createServices(entityManger, user)
                 };
 
                 return {
                     schema,
                     graphiql: true,
-                    rootValue: resolvers,
                     context
                 }
             })(req, res);

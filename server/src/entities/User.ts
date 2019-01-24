@@ -7,7 +7,7 @@ export default class User {
     @PrimaryGeneratedColumn('increment')
     id: number;
 
-    @Column()
+    @Column({unique: true})
     email: string;
 
     @Column({name: 'full_name'})
@@ -20,5 +20,5 @@ export default class User {
         lazy: true,
         nullable: true
     })
-    shopAccount: Promise<ShopAccount>;
+    shopAccount: Promise<ShopAccount | undefined>;
 }

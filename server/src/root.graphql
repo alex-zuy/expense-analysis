@@ -1,9 +1,14 @@
+scalar Date
+scalar DateTime
+
 type ShopAccount {
     id: ID!
     login: String!
     accessToken: String!
     expiresAt: Date!
     updatedAt: Date!
+    importedRangeStart: DateTime
+    importedRangeEnd: DateTime
 }
 
 type User {
@@ -19,20 +24,44 @@ type ShopAccountCheckResult {
     userName: String
 }
 
+type Product {
+    id: ID!
+    name: String!
+}
+
+type Purchase {
+    id: ID!
+    amount: Float!
+    pricePerUnit: Float!
+    purchasedAt: DateTime!
+    product: Product!
+}
+
+type PurchasesGroup {
+    id: ID!
+    purchasedAt: DateTime!
+    items: [Purchase!]!
+    totalPrice: Float!
+}
+
 type Query {
     self: User!
     shopAccountCheck(accessToken: String!): ShopAccountCheckResult!
+    purchasesGroups(dateFrom: DateTime!, dateTo: DateTime!): [PurchasesGroup!]!
 }
 
 input ShopAccountUpdateInput {
-    id: ID
     login: String!
     accessToken: String!
     expiresAt: String!
 }
 
-type Mutation {
-    updateShopAccount(input: ShopAccountUpdateInput!): ShopAccount!
+input PurchasesHistoryImportInput {
+    dateFrom: DateTime!
+    dateTo: DateTime!
 }
 
-scalar Date
+type Mutation {
+    updateShopAccount(input: ShopAccountUpdateInput!): ShopAccount!
+    importPurchasesHistory(input: PurchasesHistoryImportInput!): ShopAccount!
+}

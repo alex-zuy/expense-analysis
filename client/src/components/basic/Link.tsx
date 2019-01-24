@@ -8,9 +8,7 @@ interface LinkProps extends Pick<RouterLinkProps, 'to' | 'replace'> {
 
 const linkStyles = {
     link: {
-        '&:visited': {
-            color: 'currentColor'
-        }
+        color: 'currentColor'
     }
 };
 

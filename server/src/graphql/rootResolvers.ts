@@ -1,13 +1,19 @@
-import {ApplicationServices} from '../appConfig/createServices';
+import {GraphQLDate, GraphQLDateTime} from 'graphql-iso-date';
+import * as _ from 'lodash';
+import {Omit} from 'utility-types';
 import ShopDataProvider from '../dataProviders/ShopDataProvider';
+import Purchase from '../entities/Purchase';
+import ShopAccount from '../entities/ShopAccount';
+import User from '../entities/User';
 import {UpdateAccountFields} from '../services/ShopAccountsService';
-import {parseNodeId} from './node';
-import {createShopAccountNode, ShopAccountNode} from './nodes/shopAccountNode';
-import {createUserNode, UserNode} from './nodes/userNode';
+import DateRange from './DateRange';
+import {nodeIdResolver, parseNodeId} from './node';
 import {ResolverFunc} from './resolver';
+import * as purchasesGroupResolvers from './resolvers/purchasesGroup';
+import * as userResolvers from './resolvers/user';
 
-const self: ResolverFunc<UserNode> = async (args, {services}) => {
-    return createUserNode(await services.usersService.getCurrentUser());
+const self: ResolverFunc<User> = async (obj, args, {services}) => {
+    return services.usersService.getCurrentUser();
 };
 
 interface ShopAccountCheckResult {
@@ -17,7 +23,7 @@ interface ShopAccountCheckResult {
 }
 
 const shopAccountCheck: ResolverFunc<ShopAccountCheckResult, undefined, {accessToken: string}> =
-    async (args, {services}) => {
+    async (obj, args, {services}) => {
         const {accessToken} = args;
 
         const dataProvider = new ShopDataProvider(accessToken);
@@ -34,20 +40,70 @@ const shopAccountCheck: ResolverFunc<ShopAccountCheckResult, undefined, {accessT
                 error: e.message
             };
         }
-    }
+    };
 
-type UpdateShopAccountInput = UpdateAccountFields & {id: string | null};
+export interface PurchasesGroup {
+    id: string,
+    purchasedAt: Date,
+    items: Purchase[],
+    totalPrice: number
+}
 
-const updateShopAccount: ResolverFunc<ShopAccountNode, undefined, {input: UpdateShopAccountInput}> =
-    async (args, {services}) => {
-        const {id, ...rest} = args.input;
-        const realId = id ? parseNodeId(id).id : null;
-        const account = await services.shopAccountsService.createOrUpdateShopAccount(realId, rest);
-        return createShopAccountNode(account);
-    }
+const purchasesGroups: ResolverFunc<Array<Pick<PurchasesGroup, 'purchasedAt' | 'items'>>, undefined, DateRange> =
+    async (source, args, {services}) => {
+        const purchases = await services.purchasesService.listPurchases(args);
+
+        const groupsMap = _.groupBy(purchases, (purchase) => purchase.purchasedAt.getTime());
+
+        const groups = Object.entries(groupsMap)
+            .map(([dateTimestamp, purchases]) => {
+                return {
+                    purchasedAt: new Date(Number(dateTimestamp)),
+                    items: purchases
+                }
+            });
+
+        return _.sortBy(groups, (group) => group.purchasedAt.getTime()).reverse();
+    };
+
+type UpdateShopAccountInput = UpdateAccountFields;
+
+const updateShopAccount: ResolverFunc<ShopAccount, undefined, {input: UpdateShopAccountInput}> =
+    async (obj, args, {services}) => {
+        return await services.shopAccountsService.createOrUpdateShopAccountFields(args.input);
+    };
+
+const importPurchasesHistory: ResolverFunc<ShopAccount, undefined, {input: DateRange}> =
+    async (obj, args, {currentUser, services}) => {
+        return services.purchasesService.importPurchasesFromHistory(args.input);
+    };
 
 export default {
-    self,
-    shopAccountCheck,
-    updateShopAccount
+    Date: GraphQLDate,
+    DateTime: GraphQLDateTime,
+    Query: {
+        self,
+        shopAccountCheck,
+        purchasesGroups
+    },
+    Mutation: {
+        updateShopAccount,
+        importPurchasesHistory
+    },
+    User: {
+        id: nodeIdResolver,
+        ...userResolvers
+    },
+    ShopAccount: {
+        id: nodeIdResolver
+    },
+    Product: {
+        id: nodeIdResolver
+    },
+    Purchase: {
+        id: nodeIdResolver
+    },
+    PurchasesGroup: {
+        ...purchasesGroupResolvers
+    }
 };
