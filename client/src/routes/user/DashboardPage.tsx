@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {Route, RouteComponentProps} from 'react-router';
-import Link from '../../components/basic/Link';
 import CurrentUser from '../../components/CurrentUser';
 import DashboardLayout from '../../components/DashboardLayout';
 import {requireLoggedInUser} from '../../components/hoc/requireLoggedInUser';
+import MenuLink from '../../components/MenuLink';
+import ExpensesClassificationPage from './ExpensesClassificationPage/ExpensesClassificationPage';
 import PurchaseHistoryPage from './PurchaseHistoryPage/PurchaseHistoryPage';
 import ShopAccountPage from './ShopAccountPage/ShopAccountPage';
 
@@ -13,13 +14,15 @@ const DashboardPage: React.SFC<RouteComponentProps> = (props) => {
             menu={
                 <>
                     <CurrentUser/>
-                    <Link to="/shopAccount">
+                    <MenuLink to="/shopAccount">
                         Shop account
-                    </Link>
-                    <br/>
-                    <Link to="/purchasesHistory">
+                    </MenuLink>
+                    <MenuLink to="/purchasesHistory">
                         Purchases history
-                    </Link>
+                    </MenuLink>
+                    <MenuLink to="/expensesClassification">
+                        Expenses classification
+                    </MenuLink>
                 </>
             }
             content={(
@@ -27,6 +30,7 @@ const DashboardPage: React.SFC<RouteComponentProps> = (props) => {
                     <Route path="/" exact render={() => 'root content'}/>
                     <Route path="/shopAccount" component={ShopAccountPage}/>
                     <Route path="/purchasesHistory" component={PurchaseHistoryPage}/>
+                    <Route path="/expensesClassification" component={ExpensesClassificationPage}/>
                 </>
             )}
         />

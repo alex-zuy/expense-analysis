@@ -6,7 +6,7 @@ interface LinkProps extends Pick<RouterLinkProps, 'to' | 'replace'> {
 
 }
 
-const linkStyles = {
+const linkStyles: StyleSheet<LinkProps> = {
     link: {
         color: 'currentColor'
     }
@@ -22,4 +22,4 @@ const Link: React.SFC<LinkProps & WithStyles> = (props) => {
     )
 };
 
-export default injectSheet(linkStyles as any)(Link);
+export default injectSheet(linkStyles)(Link);
