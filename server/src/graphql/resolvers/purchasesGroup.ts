@@ -1,10 +1,9 @@
-import Purchase from '../../entities/Purchase';
+import {composeNodeId} from '../node';
 import {ResolverFunc} from '../resolver';
 import {PurchasesGroup} from '../rootResolvers';
 
-export const id: ResolverFunc<string, PurchasesGroup> = (source) => {
-    return `PurchasesGroup__${source.purchasedAt.getTime()}`;
-};
+export const id: ResolverFunc<string, PurchasesGroup> =
+    (source) => composeNodeId('PurchasesGroup', source.purchasedAt.getTime());
 
 export const totalPrice: ResolverFunc<string, PurchasesGroup> = (source) => {
     return source.items.reduce(

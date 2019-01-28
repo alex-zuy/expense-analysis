@@ -9,7 +9,9 @@ interface DateRange {
     dateTo: Date
 }
 
-export interface ListPurchasesCriteria extends DateRange { }
+export interface ListPurchasesCriteria extends Partial<DateRange> {
+    products?: number[]
+}
 
 export default class PurchasesService {
 
@@ -33,9 +35,19 @@ export default class PurchasesService {
     async listPurchases(criteria: ListPurchasesCriteria): Promise<Purchase[]> {
         const queryBuilder = this.purchasesRepository.createQueryBuilder('purchase')
             .innerJoinAndSelect('purchase.product', 'product')
-            .where('product.user = :userId', {userId: this.currentUser.id})
-            .andWhere('purchase.purchasedAt >= :dateFrom', {dateFrom: criteria.dateFrom})
-            .andWhere('purchase.purchasedAt <= :dateTo', {dateTo:  criteria.dateTo});
+            .where('product.user = :userId', {userId: this.currentUser.id});
+
+        if (criteria.dateFrom) {
+            queryBuilder.andWhere('purchase.purchasedAt >= :dateFrom', {dateFrom: criteria.dateFrom});
+        }
+
+        if (criteria.dateTo) {
+            queryBuilder.andWhere('purchase.purchasedAt <= :dateTo', {dateTo:  criteria.dateTo});
+        }
+
+        if (criteria.products) {
+            queryBuilder.andWhere('product.id IN (:...ids)', {ids: criteria.products});
+        }
 
         return queryBuilder.getMany();
     }

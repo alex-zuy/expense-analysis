@@ -19,7 +19,8 @@ const styles: StyleSheet<Props> = {
     },
     content: {
         flexGrow: 1,
-        padding: '1rem'
+        padding: '1rem',
+        overflowY: 'auto'
     }
 }
 

@@ -1,6 +1,11 @@
 import {Repository} from 'typeorm';
+import {SetIntersection} from 'utility-types';
 import Product from '../entities/Product';
 import User from '../entities/User';
+
+export interface ProductsCriteria {
+    loadRelationships?: Array<SetIntersection<keyof Product, 'purchases'>>
+}
 
 export default class ProductsService {
 
@@ -29,5 +34,14 @@ export default class ProductsService {
             });
             return this.productRepository.save(product);
         }
+    }
+
+    async listProducts(criteria: ProductsCriteria = {}): Promise<Product[]> {
+        return this.productRepository.find({
+            where: {
+                user: this.currentUser
+            },
+            relations: criteria.loadRelationships
+        });
     }
 }

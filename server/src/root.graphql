@@ -27,6 +27,9 @@ type ShopAccountCheckResult {
 type Product {
     id: ID!
     name: String!
+    category: Category
+    categoryPath: [Category!]!
+    tags: [Tag!]!
 }
 
 type Purchase {
@@ -44,10 +47,32 @@ type PurchasesGroup {
     totalPrice: Float!
 }
 
+type ProductExpense {
+    id: ID!
+    product: Product!
+    expense: Float!
+}
+
+type Category {
+    id: ID!
+    name: String!
+    color: String!
+    parent: Category
+}
+
+type Tag {
+    id: ID!
+    name: String!
+    color: String!
+}
+
 type Query {
     self: User!
     shopAccountCheck(accessToken: String!): ShopAccountCheckResult!
     purchasesGroups(dateFrom: DateTime!, dateTo: DateTime!): [PurchasesGroup!]!
+    categories: [Category]!
+    tags: [Tag]!
+    productsExpenses: [ProductExpense!]!
 }
 
 input ShopAccountUpdateInput {

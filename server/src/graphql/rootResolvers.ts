@@ -1,16 +1,20 @@
 import {GraphQLDate, GraphQLDateTime} from 'graphql-iso-date';
 import * as _ from 'lodash';
-import {Omit} from 'utility-types';
+import {type} from 'os';
 import ShopDataProvider from '../dataProviders/ShopDataProvider';
+import Category from '../entities/Category';
+import Product from '../entities/Product';
 import Purchase from '../entities/Purchase';
 import ShopAccount from '../entities/ShopAccount';
+import Tag from '../entities/Tag';
 import User from '../entities/User';
 import {UpdateAccountFields} from '../services/ShopAccountsService';
 import DateRange from './DateRange';
-import {nodeIdResolver, parseNodeId} from './node';
+import {composeNodeId, nodeIdResolver} from './node';
 import {ResolverFunc} from './resolver';
 import * as purchasesGroupResolvers from './resolvers/purchasesGroup';
 import * as userResolvers from './resolvers/user';
+import * as productResolvers from  './resolvers/product';
 
 const self: ResolverFunc<User> = async (obj, args, {services}) => {
     return services.usersService.getCurrentUser();
@@ -66,6 +70,46 @@ const purchasesGroups: ResolverFunc<Array<Pick<PurchasesGroup, 'purchasedAt' | '
         return _.sortBy(groups, (group) => group.purchasedAt.getTime()).reverse();
     };
 
+const categories: ResolverFunc<Category[], undefined> =
+    async (source, args, {services}) => {
+        return services.categoriesService.listCategories();
+    };
+
+const tags: ResolverFunc<Tag[], undefined> =
+    (source, args, context) => {
+        return context.services.tagsService.listTags();
+    };
+
+export interface ProductExpense {
+    id: string;
+    product: Product;
+    expense: number;
+}
+
+const productsExpenses: ResolverFunc<ProductExpense, undefined, {}> =
+    async (source, args, context, info) => {
+        const products = await context.services.productsService.listProducts({
+            loadRelationships: ['purchases']
+        });
+
+        const expenses = products.map((product) => {
+            const purchases = product.purchases!;
+
+            const expense = purchases.reduce(
+                (sum, purchase) => sum + purchase.pricePerUnit * purchase.amount,
+                0
+            );
+
+            return {
+                id: composeNodeId('ProductExpense', product.id),
+                product,
+                expense
+            }
+        });
+
+        return _.sortBy(expenses, 'expense').reverse();
+    };
+
 type UpdateShopAccountInput = UpdateAccountFields;
 
 const updateShopAccount: ResolverFunc<ShopAccount, undefined, {input: UpdateShopAccountInput}> =
@@ -84,7 +128,10 @@ export default {
     Query: {
         self,
         shopAccountCheck,
-        purchasesGroups
+        purchasesGroups,
+        categories,
+        tags,
+        productsExpenses
     },
     Mutation: {
         updateShopAccount,
@@ -98,12 +145,20 @@ export default {
         id: nodeIdResolver
     },
     Product: {
-        id: nodeIdResolver
+        id: nodeIdResolver,
+        ...productResolvers
     },
     Purchase: {
         id: nodeIdResolver
     },
     PurchasesGroup: {
         ...purchasesGroupResolvers
+    },
+    ProductExpense: {},
+    Category: {
+        id: nodeIdResolver
+    },
+    Tag: {
+        id: nodeIdResolver
     }
 };

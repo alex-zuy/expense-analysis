@@ -6,9 +6,9 @@ const API_URL = 'https://silpo.ua/graphql';
 
 const API_DATE_TIME_FORMAT_WITH_TIME = 'YYYY-MM-DDTHH:mm:ss.SSS[Z]';
 /**
- *  external API expects input dates in format with zero-valued time
+ *  external API expects input dates in format with zero-valued milliseconds time
  * */
-const API_DATE_TIME_FORMAT_WITHOUT_TIME = 'YYYY-MM-DDT00:00:00.000[Z]';
+const API_DATE_TIME_FORMAT_WITHOUT_TIME = 'YYYY-MM-DDTHH:mm:ss.000[Z]';
 
 export interface AccountInfo {
     firstName: string,

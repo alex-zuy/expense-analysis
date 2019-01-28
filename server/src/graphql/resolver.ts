@@ -8,5 +8,6 @@ export interface ResolverContext {
     services: ApplicationServices
 }
 
+//TODO: ResultType is unused
 export interface ResolverFunc<ResultType, ParentObjType = undefined, FieldArgsType = {}>
     extends IFieldResolver<ParentObjType, ResolverContext, FieldArgsType> {}

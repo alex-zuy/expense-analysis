@@ -1,6 +1,7 @@
 declare module 'react-jss' {
 
     import * as React from 'react';
+    import {Diff} from 'utility-types';
 
     export interface CSSProperties extends React.CSSProperties {
         composes?: string | string[]
@@ -30,9 +31,9 @@ declare module 'react-jss' {
     function injectSheet<ClassKey extends string>(
         style: StyleRules<ClassKey>,
         options?: any,
-    ): <P>(
-        component: React.ComponentType<P & WithStyles<ClassKey>>,
-    ) => React.ComponentType<P>;
+    ): <P extends object>(
+        component: React.ComponentType<P>,
+    ) => React.ComponentType<Diff<P, WithStyles>>;
 
     export default injectSheet;
 

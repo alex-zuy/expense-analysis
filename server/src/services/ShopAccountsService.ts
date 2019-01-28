@@ -17,7 +17,6 @@ export default class ShopAccountsService {
 
     private readonly currentUser: User;
 
-
     constructor(shopAccountsRepository: Repository<ShopAccount>, currentUser: User) {
         this.shopAccountsRepository = shopAccountsRepository;
         this.currentUser = currentUser;
